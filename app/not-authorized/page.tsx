@@ -1,0 +1,11 @@
+export default function NotAuthorized() {
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+      <div>
+        <h1>Access Denied</h1>
+        <p style={{ color: '#888', margin: '12px 0 24px' }}>Your account does not have superadmin privileges.</p>
+        <a href="/login" style={{ padding: '10px 20px', background: '#1a1a1e', border: '1px solid #333', borderRadius: 8, color: '#f0ede8' }}>← Back to Login</a>
+      </div>
+    </div>
+  )
+}
