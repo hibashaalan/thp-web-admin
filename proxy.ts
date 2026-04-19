@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -31,10 +31,8 @@ export async function proxy(request: NextRequest) {
       .single()
 
     if (!profile?.is_superadmin) {
-      // Sign out server-side by clearing the session cookies
       await supabase.auth.signOut()
       const redirectResponse = NextResponse.redirect(new URL('/not-authorized', request.url))
-      // Clear auth cookies on the redirect response
       request.cookies.getAll().forEach(cookie => {
         if (cookie.name.includes('auth') || cookie.name.includes('supabase')) {
           redirectResponse.cookies.delete(cookie.name)
