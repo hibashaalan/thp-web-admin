@@ -23,8 +23,25 @@ export async function proxy(request: NextRequest) {
 
   if (request.nextUrl.pathname.startsWith('/admin')) {
     if (!user) return NextResponse.redirect(new URL('/login', request.url))
-    const { data: profile } = await supabase.from('profiles').select('is_superadmin').eq('id', user.id).single()
-    if (!profile?.is_superadmin) return NextResponse.redirect(new URL('/not-authorized', request.url))
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_superadmin')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile?.is_superadmin) {
+      // Sign out server-side by clearing the session cookies
+      await supabase.auth.signOut()
+      const redirectResponse = NextResponse.redirect(new URL('/not-authorized', request.url))
+      // Clear auth cookies on the redirect response
+      request.cookies.getAll().forEach(cookie => {
+        if (cookie.name.includes('auth') || cookie.name.includes('supabase')) {
+          redirectResponse.cookies.delete(cookie.name)
+        }
+      })
+      return redirectResponse
+    }
   }
 
   return response
