@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -21,7 +22,6 @@ export default async function DashboardPage() {
     supabase.from('caption_votes').select('created_datetime_utc').order('created_datetime_utc', { ascending: false }).limit(500),
   ])
 
-  // Top captions
   const captionMap: Record<string, { content: string, url: string | null, count: number }> = {}
   topCaptionVotes?.forEach((v: any) => {
     const id = v.caption_id
@@ -30,7 +30,6 @@ export default async function DashboardPage() {
   })
   const top5 = Object.values(captionMap).sort((a, b) => b.count - a.count).slice(0, 5)
 
-  // Votes per day
   const dayMap: Record<string, number> = {}
   for (let i = 6; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i)
@@ -47,15 +46,14 @@ export default async function DashboardPage() {
   const mehCount = recentVotes?.filter((v: any) => v.vote_value === -1).length ?? 0
 
   const stats = [
-    { label: 'Users', value: totalUsers ?? 0, icon: '◉', color: 'var(--blue)', bg: 'var(--blue-dim)' },
-    { label: 'Images', value: totalImages ?? 0, icon: '◧', color: 'var(--accent)', bg: 'var(--accent-dim)' },
-    { label: 'Captions', value: totalCaptions ?? 0, icon: '◫', color: 'var(--purple)', bg: 'var(--purple-dim)' },
-    { label: 'Total Votes', value: totalVotes ?? 0, icon: '♥', color: 'var(--success)', bg: 'var(--success-dim)' },
+    { label: 'Users', value: totalUsers ?? 0, icon: '◉', color: 'var(--blue)', bg: 'var(--blue-dim)', href: '/admin/users' },
+    { label: 'Images', value: totalImages ?? 0, icon: '◧', color: 'var(--accent)', bg: 'var(--accent-dim)', href: '/admin/images' },
+    { label: 'Captions', value: totalCaptions ?? 0, icon: '◫', color: 'var(--purple)', bg: 'var(--purple-dim)', href: '/admin/captions' },
+    { label: 'Total Votes', value: totalVotes ?? 0, icon: '♥', color: 'var(--success)', bg: 'var(--success-dim)', href: '/admin' },
   ]
 
   return (
     <div style={{ padding: '32px', animation: 'fadeUp 0.3s ease both' }}>
-      {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.03em', marginBottom: 4 }}>Dashboard</h1>
         <p style={{ color: 'var(--text-muted)', fontSize: 12, fontFamily: 'DM Mono, monospace' }}>
@@ -65,16 +63,12 @@ export default async function DashboardPage() {
 
       {/* Stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
-        {stats.map(({ label, value, icon, color, bg }) => (
-          <div key={label} style={{
+        {stats.map(({ label, value, icon, color, bg, href }) => (
+          <Link key={label} href={href} style={{
             background: 'var(--surface)', border: '1px solid var(--border)',
-            borderRadius: 12, padding: '20px',
-            transition: 'border-color 0.2s, transform 0.2s',
-            cursor: 'default',
-          }}
-            onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = color; el.style.transform = 'translateY(-2px)' }}
-            onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--border)'; el.style.transform = 'translateY(0)' }}
-          >
+            borderRadius: 12, padding: '20px', display: 'block', textDecoration: 'none',
+            transition: 'border-color 0.2s',
+          }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{label}</span>
               <div style={{ width: 28, height: 28, borderRadius: 7, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color }}>{icon}</div>
@@ -82,12 +76,12 @@ export default async function DashboardPage() {
             <div style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.03em', fontFamily: 'DM Mono, monospace', color: 'var(--text)' }}>
               {value.toLocaleString()}
             </div>
-          </div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>View all →</div>
+          </Link>
         ))}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 12, marginBottom: 12 }}>
-        {/* Vote trend */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
             <h2 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>Vote Activity</h2>
@@ -100,10 +94,7 @@ export default async function DashboardPage() {
                 <div style={{
                   width: '100%', borderRadius: 5,
                   height: `${Math.max((count / maxDay) * 64, 3)}px`,
-                  background: count > 0
-                    ? `linear-gradient(to top, var(--accent), rgba(232,197,71,0.5))`
-                    : 'var(--surface3)',
-                  transition: 'height 0.3s',
+                  background: count > 0 ? 'linear-gradient(to top, var(--accent), rgba(232,197,71,0.5))' : 'var(--surface3)',
                 }} />
                 <div style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: 'DM Mono, monospace' }}>
                   {new Date(day + 'T00:00:00').toLocaleDateString('en', { weekday: 'short' })}
@@ -113,7 +104,6 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Sentiment */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px' }}>
           <h2 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 16 }}>Sentiment</h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
@@ -131,7 +121,6 @@ export default async function DashboardPage() {
               height: '100%', borderRadius: 3,
               width: `${funnyCount + mehCount > 0 ? (funnyCount / (funnyCount + mehCount)) * 100 : 50}%`,
               background: 'linear-gradient(90deg, var(--accent), rgba(232,197,71,0.6))',
-              transition: 'width 0.4s',
             }} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 5, fontSize: 10, color: 'var(--text-muted)' }}>
@@ -141,7 +130,6 @@ export default async function DashboardPage() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-        {/* Top captions */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px' }}>
           <h2 style={{ fontSize: 13, fontWeight: 600, marginBottom: 16 }}>Top Voted Captions</h2>
           {top5.length === 0 && <p style={{ color: 'var(--text-muted)', fontSize: 12 }}>No data yet</p>}
@@ -155,7 +143,6 @@ export default async function DashboardPage() {
           ))}
         </div>
 
-        {/* Recent activity */}
         <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px' }}>
           <h2 style={{ fontSize: 13, fontWeight: 600, marginBottom: 16 }}>Recent Activity</h2>
           <div style={{ display: 'grid', gap: 6 }}>

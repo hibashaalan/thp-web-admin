@@ -65,3 +65,8 @@ img { display: block; }
   from { background-position: -200% center; }
   to { background-position: 200% center; }
 }
+.stat-card:hover {
+  border-color: var(--accent) !important;
+  transform: translateY(-2px);
+  transition: all 0.2s;
+}
