@@ -166,6 +166,41 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '20px', marginTop: 12 }}>
+        <h2 style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Admin Modules</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 8 }}>
+          {[
+            { href: '/admin/humor-flavors', label: 'Humor Flavors' },
+            { href: '/admin/humor-flavor-steps', label: 'Humor Flavor Steps' },
+            { href: '/admin/humor-mix', label: 'Humor Mix' },
+            { href: '/admin/terms', label: 'Terms' },
+            { href: '/admin/caption-requests', label: 'Caption Requests' },
+            { href: '/admin/caption-examples', label: 'Caption Examples' },
+            { href: '/admin/llm-providers', label: 'LLM Providers' },
+            { href: '/admin/llm-models', label: 'LLM Models' },
+            { href: '/admin/llm-prompt-chains', label: 'Prompt Chains' },
+            { href: '/admin/llm-responses', label: 'LLM Responses' },
+            { href: '/admin/allowed-signup-domains', label: 'Allowed Domains' },
+            { href: '/admin/whitelisted-emails', label: 'Whitelisted Emails' },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              style={{
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                padding: '8px 10px',
+                fontSize: 12,
+                color: 'var(--text-mid)',
+                background: 'var(--surface2)',
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

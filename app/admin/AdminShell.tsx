@@ -8,6 +8,18 @@ const NAV = [
   { href: '/admin/users', label: 'Users', icon: '◉' },
   { href: '/admin/images', label: 'Images', icon: '◧' },
   { href: '/admin/captions', label: 'Captions', icon: '◫' },
+  { href: '/admin/caption-requests', label: 'Caption Requests', icon: '◬' },
+  { href: '/admin/humor-flavors', label: 'Humor Flavors', icon: '◍' },
+  { href: '/admin/humor-flavor-steps', label: 'Humor Flavor Steps', icon: '◎' },
+  { href: '/admin/humor-mix', label: 'Humor Mix', icon: '◌' },
+  { href: '/admin/terms', label: 'Terms', icon: '◪' },
+  { href: '/admin/caption-examples', label: 'Caption Examples', icon: '◨' },
+  { href: '/admin/llm-providers', label: 'LLM Providers', icon: '◔' },
+  { href: '/admin/llm-models', label: 'LLM Models', icon: '◕' },
+  { href: '/admin/llm-prompt-chains', label: 'LLM Prompt Chains', icon: '◠' },
+  { href: '/admin/llm-responses', label: 'LLM Responses', icon: '◡' },
+  { href: '/admin/allowed-signup-domains', label: 'Allowed Domains', icon: '◒' },
+  { href: '/admin/whitelisted-emails', label: 'Whitelisted Emails', icon: '◓' },
 ]
 
 export default function AdminShell({ children, user }: { children: React.ReactNode, user: any }) {

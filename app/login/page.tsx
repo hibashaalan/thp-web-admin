@@ -1,13 +1,23 @@
 'use client'
 import { createClient } from '@/lib/supabase/client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
+  const [authError, setAuthError] = useState<string | null>(null)
   const supabase = createClient()
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const error = params.get('error')
+    if (error) setAuthError(error)
+  }, [])
 
   const signIn = async () => {
     setLoading(true)
+    // Clear stale local auth state before starting OAuth to avoid refresh token errors.
+    await supabase.auth.signOut({ scope: 'local' })
+
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -110,6 +120,20 @@ export default function LoginPage() {
             <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 28 }}>
               Only superadmin accounts can access this panel
             </p>
+
+            {authError && (
+              <div style={{
+                background: 'var(--danger-dim)',
+                border: '1px solid rgba(224,92,92,0.25)',
+                borderRadius: 8,
+                padding: '10px 12px',
+                marginBottom: 20,
+              }}>
+                <p style={{ fontSize: 12, color: 'var(--danger)', lineHeight: 1.45 }}>
+                  Sign-in failed: {authError}
+                </p>
+              </div>
+            )}
 
             <div style={{
               background: 'var(--accent-dim)', border: '1px solid rgba(232,197,71,0.15)',
